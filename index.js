@@ -60,7 +60,7 @@ app.get("/", (req, res) => {
   res.status(200).send("Welcome To Hall Booking App");
 });
 
-//create room
+//API for create room
 app.post("/createRoom", (req, res) => {
   rooms.push({
     name: req.body.name,
@@ -73,7 +73,7 @@ app.post("/createRoom", (req, res) => {
   res.status(200).send("Room Created");
 });
 
-//Book rooms
+//API for Book rooms
 app.post("/bookRoom", (req, res, next) => {
   for (let i = 0; i < rooms.length; i++) {
     console.log("Book");
@@ -109,7 +109,7 @@ app.post("/bookRoom", (req, res, next) => {
   }
 });
 
-//list customer 
+//API for list customer 
 app.get("/listCustomer", (req, res) => {
   let customerArray = [];
 
@@ -129,7 +129,7 @@ app.get("/listCustomer", (req, res) => {
   res.send(customerArray);
 });
 
-//list rooms
+//PI for list rooms
 
 app.get("/listRooms", (req, res) => {
   console.log("list rooms");
