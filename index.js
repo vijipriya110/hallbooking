@@ -1,149 +1,145 @@
-// step:1
+
 const express = require("express");
-
-
-// step:2
 const app = express();
-const PORT = 9000;
+
 app.use(express.json());
 
-// initialize the data
-const hallData = [
-    {
-      id: "1",
-      numberOfSeats: 100,
-      amenities: ["Ac", "chairs", "discolights"],
-      price: 5000,
-      ifBooked: "true",
-      customerName: "Sanjay",
-      date: "05-feb-2022",
-      startTime: "10-feb-2022 at 12PM",
-      endTime: "11-feb-2020 at 11am",
-      RoomId: 201,
-      RoomName: "Duplex",
-    },
-    {
-      id: "2",
-      numberOfSeats: 100,
-      amenities: ["Ac", "chairs", "discolights"],
-      price: 5000,
-      ifBooked: "false",
-      customerName: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      RoomId: 202,
-      RoomName: "Duplex",
-    },
-    {
-      id: "3",
-      numberOfSeats: 50,
-      amenities: ["Ac", "chairs"],
-      price: 3000,
-      ifBooked: "false",
-      customerName: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      RoomId: 203,
-      RoomName: "Classic",
-    },
-    {
-      id: "4",
-      numberOfSeats: 100,
-      amenities: ["Ac", "chairs", "discolights"],
-      price: 5000,
-      ifBooked: "true",
-      customerName: "Suresh",
-      date: "03-feb-2022",
-      startTime: "15-feb-2022 at 12PM",
-      endTime: "16-feb-2020 at 11am",
-      RoomId: 204,
-      RoomName: "Duplex",
-    },
-    {
-      id: "5",
-      numberOfSeats: 200,
-      amenities: ["Ac", "chairs", "discolights", "buffet"],
-      price: 9000,
-      ifBooked: "true",
-      customerName: "Vidhya",
-      date: "06-feb-2022",
-      startTime: "11-feb-2022 at 12PM",
-      endTime: "12-feb-2020 at 11am",
-      RoomId: 205,
-      RoomName: "Suite",
-    },
-  ];
-  
+//room
+const rooms = [
+  {
+    name: "Elite",
+    seats: 50,
+    amenities: "wifi,projection screen,AC",
+    price: 1500,
+    roomId: "2525",
+    bookingDetails: [
+      {
+        customerName: "Guvi",
+        date: new Date("2023-01-04"),
+        start: "07:00",
+        end: "10:00",
+        status: "confirmed",
+      },
+    ],
+  },
+  {
+    name: "Premium",
+    seats: 100,
+    amenities: "wifi,projection screen,AC",
+    price: 2500,
+    roomId: "5252",
+    bookingDetails: [
+      {
+        customerName: "zen",
+        date: new Date("2023-01-05"),
+        start: "15:00",
+        end: "17:00",
+        status: "Payment Pending",
+      },
+    ],
+  },
+  {
+    name: "Semi Class",
+    seats: 120,
+    amenities: "wifi,projection screen,AC,Food",
+    price: 2500,
+    roomId: "2255",
+    bookingDetails: [
+      {
+        customerName: "GEEK",
+        date: new Date("2023-1-06"),
+        start: "15:00",
+        end: "17:00",
+        status: "Payment Pending",
+      },
+    ],
+  },
+];
+//common call api status
+app.get("/", (req, res) => {
+  res.status(200).send("Welcome To Hall Booking App");
+});
 
-// step:3
-//get request logic and method
-    app.get("/hall-details",(req,res)=>{
-  
-    // To check details of booked rooms logic using request.query
-
-    const {ifBooked, numberOfSeats} = req.query;
-        let filteredHall = hallData;
-    if(ifBooked) {
-       filteredHall = filteredHall.filter((halls)=>halls.ifBooked === ifBooked) //query=> ifBooked = "true"
-  
-    }
-    if(numberOfSeats) {
-      filteredHall = filteredHall.filter((halls)=>halls.numberOfSeats >= +numberOfSeats) //query=>numberOfSeats = "50"
-    }
-    res.send(filteredHall)
-})
-
-
-// posting  a new hall
-
-app.post("/new-hall", (req, res) => {
-  const newHall = {
-    id: hallData.length + 1,
-    numberOfSeats: req.body.numberOfSeats,
+//create room
+app.post("/createRoom", (req, res) => {
+  rooms.push({
+    name: req.body.name,
+    seats: req.body.seats,
     amenities: req.body.amenities,
     price: req.body.price,
-    RoomId: req.body.RoomId,
-  };
-  hallData.push(newHall);
-  res.send(newHall);
+    roomId: "001",
+    bookingDetails: [{}],
+  });
+  res.status(200).send("Room Created");
 });
 
-// Getting specific id
-
-app.get("/hall-details/:id",(req,res)=>{
-  
-  // to get the specific room details by using params
-
- const {id} = req.params;
- console.group(id);
-
- const halls = hallData.find((hall)=>hall.id === id);
- res.send(halls);
-})
-
-
-//updating a new hall which is not booked 
-
-app.put("/hall-details/:id", (req, res) => {
-  const { id } = req.params;
-  const halls = hallData.find((hall) => hall.id === id);
-  //logic for not updating an already booked room.
-  if (halls.ifBooked === "true") {
-    res.status(400).send("Hey this room is already booked");
-    return;
-  } else halls.customerName = req.body.customerName;
-  halls.date = req.body.date;
-  halls.startTime = req.body.startTime;
-  halls.endTime = req.body.endTime;
-  res.send(halls);
+//Book rooms
+app.post("/bookRoom", (req, res, next) => {
+  for (let i = 0; i < rooms.length; i++) {
+    console.log("Book");
+    if (!(rooms[i].roomId === req.body.roomId)) {
+      return res.status(400).send({ error: "Invalid" });
+    } else {
+      let booking = {
+        customerName: req.body.name,
+        date: new Date(req.body.date),
+        start: req.body.start,
+        end: req.body.end,
+        status: "confirmed",
+      };
+      let result = undefined;
+      rooms[i].bookingDetails.forEach((book) => {
+        if (
+          book.date.getTime() == booking.date.getTime() &&
+          book.start === booking.start
+        ) {
+          result = 0;
+          console.log("in booking");
+        } else {
+          result = 1;
+          rooms[i].bookingDetails.push(booking);
+        }
+      });
+      if (result) return res.status(200).send("Booking confirmed");
+      else
+        return res
+          .status(400)
+          .send({ error: "Please select different time slot" });
+    }
+  }
 });
 
-// delivering the port address
+//list customer 
+app.get("/listCustomer", (req, res) => {
+  let customerArray = [];
 
-app.listen(PORT, () =>
-  console.log(`Server started on port: localhost:${PORT}/hall-details`, PORT));
+  rooms.forEach((room) => {
+    let customerObj = { roomName: room.name };
 
-  
+    room.bookingDetails.forEach((customer) => {
+      customerObj.customerName = customer.customerName;
+      customerObj.date = customer.date;
+      customerObj.start = customer.start;
+      customerObj.end = customer.end;
 
+      customerArray.push(customerObj);
+    });
+  });
+
+  res.send(customerArray);
+});
+
+//list rooms
+
+app.get("/listRooms", (req, res) => {
+  console.log("list rooms");
+  res.status(200).send(rooms);
+});
+
+
+
+
+
+app.listen(9000, () => {
+  console.log(`server started at ${9000}`);
+});
