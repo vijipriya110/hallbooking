@@ -55,6 +55,7 @@ const rooms = [
     ],
   },
 ];
+
 //common call api status
 app.get("/", (req, res) => {
   res.status(200).send("Welcome To Hall Booking App");
@@ -129,7 +130,7 @@ app.get("/listCustomer", (req, res) => {
   res.send(customerArray);
 });
 
-//PI for list rooms
+//API for list rooms
 
 app.get("/listRooms", (req, res) => {
   console.log("list rooms");
@@ -137,9 +138,7 @@ app.get("/listRooms", (req, res) => {
 });
 
 
-
-
-
-app.listen(9000, () => {
-  console.log(`server started at ${9000}`);
+//app listen to server
+app.listen(8000, () => {
+  console.log(`server started at ${8000}`);
 });
